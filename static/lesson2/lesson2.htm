@@ -1,0 +1,85 @@
+<html>
+	<head>
+		<title>Lesson 2</title>
+		<style>
+			* { margin: 0; padding: 0;}
+			body { background: #111;}
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body oncontextmenu="return false;">
+		<script src="./three.min.js"></script>
+<script>
+    var scene = new THREE.Scene()
+
+    var camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 )
+    camera.position.z = 5
+    scene.add(camera)
+
+    var rendersettings = {}
+    rendersettings.antialias = true
+    var renderer = new THREE.WebGLRenderer(rendersettings)
+    renderer.setSize( window.innerWidth, window.innerHeight )
+    document.body.appendChild( renderer.domElement );           //adds the render output to the document
+
+
+    var geometry = new THREE.CubeGeometry( 3, 4, 5, 15, 20, 25)
+    var matsettings = {}
+    matsettings.color = rgb(255,155,25) //rgb is a function we made, see below
+    matsettings.wireframe = true
+    var material = new THREE.MeshBasicMaterial( matsettings )    
+    var mesh = new THREE.Mesh( geometry, material )
+    scene.add( mesh )
+
+    document.addEventListener( 'mousedown', mouseDown, false );
+    document.addEventListener( 'mousemove', mouseMove, false );
+    document.addEventListener( 'keydown', keyDown, false );
+    document.addEventListener( 'keyup', keyUp, false );
+
+    animate()
+
+    function animate() {
+    	//camera.rotation.z += 0.001
+        mesh.rotation.x += 0.003
+        requestAnimationFrame( animate )         
+        renderer.render( scene, camera )
+    }
+
+    function rgb(red,green,blue) {
+        var r = Math.round( red   * Math.random() )
+        var g = Math.round( green * Math.random() )
+        var b = Math.round( blue  * Math.random() )
+        return "rgb("+r+","+g+","+b+")"
+    }
+
+    function mouseDown( mousebutton ) {
+        mousebutton.preventDefault(); //prevents browser popup/link following etc.
+        console.log(mousebutton)  //check the browser console to see the event properties
+        if (mousebutton.button == 0) {
+            //LEFT CLICK
+            camera.position.z = 4    
+        }
+        if (mousebutton.button == 2) {
+            //RIGHT CLICK
+            camera.position.z = 0
+        }
+        
+    }
+
+    function mouseMove( mouse ) {
+        mouse.preventDefault();
+        mesh.rotation.x = mouse.x/1000
+        mesh.rotation.y = mouse.y/1000
+    }
+
+    function keyDown( key ) {
+        console.log("key down:"+key.which)
+    }
+
+    function keyUp( key ) {        
+        console.log("key up:"+key.which)
+    }
+
+</script>
+	</body>
+</html>

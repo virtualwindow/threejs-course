@@ -1,0 +1,80 @@
+<html>
+	<head>
+		<title>Lesson 1</title>
+		<style>
+			* { margin: 0; padding: 0;}
+			body { background: #111;}
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="./three.min.js"></script>
+<script>
+    var scene = new THREE.Scene()
+
+    //create and move our camera
+    var camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 )
+    camera.position.z = 5
+    scene.add(camera)
+
+    //choose your renderer.. Canvas is more compatible, and WebGL offers more features
+    //var renderer = new THREE.CanvasRenderer()
+    var rendersettings = {}
+    rendersettings.antialias = true
+    var renderer = new THREE.WebGLRenderer(rendersettings)
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    document.body.appendChild( renderer.domElement );           //adds the render output to the document
+
+
+    /*
+        OUR CUBE
+    */
+    //make cube, this creates the vertices for us. 1 unit size and 5 segments per side
+    var geometry = new THREE.CubeGeometry( 3, 4, 5, 15, 20, 25);
+    
+    //material settings
+    var matsettings = {}
+    matsettings.color = rgb(255,155,25) //rgb is a function we made, see below
+    matsettings.wireframe = true
+
+    //create the material
+    var material = new THREE.MeshBasicMaterial( matsettings )    
+
+    //create the mesh with geometry and material ready
+    var mesh = new THREE.Mesh( geometry, material );
+
+    //add the cubemesh to the scene, you can have multiple scenes with different things inside each
+    scene.add( mesh );              
+
+
+    /*
+        RENDER FRAMES AND ANIMATE
+    */
+
+    animate();      //this runs the function animate() below
+
+    function animate() {
+        //do your animations in here
+    	camera.rotation.z += 0.01     //adds 0.01 to the current camera rotation in z
+        mesh.rotation.x += 0.03     //adds 0.01 to the current camera rotation in z
+        
+        // which then just keeps running because of threejs's requestAnimationFrame(animate) 
+        requestAnimationFrame( animate );         
+        renderer.render( scene, camera );
+    }
+
+
+    /*
+        HELPER FUNCTIONS
+    */
+
+    function rgb(red,green,blue) {
+        var r = Math.round( red * Math.random() )
+        var g = Math.round( green * Math.random() )
+        var b = Math.round( blue * Math.random() )
+        return "rgb("+r+","+g+","+b+")"
+    }
+
+</script>
+	</body>
+</html>

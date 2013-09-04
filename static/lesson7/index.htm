@@ -1,0 +1,317 @@
+<html>
+	<head>
+		<title>Welcome to VirtualWindow - Selection</title>
+		<style>
+			* { margin: 0; padding: 0;}
+			body { background: #fff;}
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="/three.min.js"></script>
+		<script src="/fonts/helvetiker_bold.typeface.js"></script>
+		<script src="/fonts/helvetiker_regular.typeface.js"></script>
+<script>
+
+    var camera, scene, renderer;
+    var projector;
+    var campivot;
+    var geometry, material, mesh;
+    var text3d;
+    var theText
+    var text;
+    var textMaterial;
+    var centerOffset
+    var counter = 0;
+    var anim = 0;
+    var objectslist = [];
+    var doUpdate;
+    var boxes = [];
+
+    var user = {
+        mouseX : 0,
+        mouseY : 0,
+        starttime: Date.now()
+    }
+
+    var vw = {
+        departments: [
+            {   name: "FILM & TV", color: [240,95,76],
+                subjects: ["FILM & TELEVISION", "MOTION DESIGN", "3D ANIMATION"]
+            },
+            {   name: "PRODUCTION DESIGN", color: [238,181,92],
+                subjects: ["FORM & SPACE", "INTERACTIVE DEVELOPMENT", "3D ANIMATION"]
+            },
+            {   name: "GAME DESIGN", color: [234,233,117],
+                subjects: [
+                    { name: "GD101: Introduction to Game Design Theory"},
+                    { name: "GD102: Game History, Art & Technology"},
+                    { name: "GD103: Game Interface Design"},
+                    { name: "GD104: Interactive Animation for Games"},
+                    { name: "GD201: Game Architecture & Design"},
+                    { name: "GD202: Game Player Setup (in Unity 3d)"},
+                    { name: "GD203: Virtual Environment Setup (in Unity 3d)"},
+                    { name: "GD204: Game Programming Fundamentals"},
+                    { name: "GD205E: Concept Art for Games"},
+                    { name: "GD206E: Real-time Animation and Physics"},
+                    { name: "GD207E: Real-time Rendering Techniques"},
+                    { name: "GD208E: Game Publishing"},
+                    { name: "GD301: Game Studies"},
+                    { name: "GD302: Advanced Game Mechanics"},
+                    { name: "GD303: Game Asset Development"},
+                    { name: "GD304: Game Building and Development"},
+                    { name: "GD305E: Game Prototype Development"},
+                    { name: "GD306E: Game Enhancement Technologies"},
+                    { name: "GD307E: Game Art and User Interface Design."},
+                    { name: "GD308E: Presentation Technology"},
+                ]
+            },
+            {   name: "3D ANIMATION", color: [158,206,107],
+                subjects: [
+                    { name: "3D101: 3D Interface study"},
+                    { name: "3D101: 3D Interface study"},
+                    { name: "3D102: 3D Modelling techniques"},
+                    { name: "3D103: 3D Shading and rendering"},
+                    { name: "3D104: 3D Animation fundamentals"},
+                    { name: "3D201: 3D Character Design"},
+                    { name: "3D202: 3D Character and Environment Setup"},
+                    { name: "3D203: 3D Character Animation"},
+                    { name: "3D204: 3D Animation Post-Production"},
+                    { name: "3D205E: 3D Character Development"},
+                    { name: "3D206E: 3D Character Setup for Anim. & Games"},
+                    { name: "3D207E: 3D Digital Environment Rendering"},
+                    { name: "3D208E: 3D Special Effects (ICE)"},
+                    { name: "3D301: 3D Short-film Pitch"},
+                    { name: "3D302: 3D Asset Production"},
+                    { name: "3D303: 3D Animation, Simulation and Effects"},
+                    { name: "3D304: 3D Lighting, Rendering and Compositing"},
+                    { name: "3D305E: Visual Development for CGI"},
+                    { name: "3D306E: 3D Pre-Visualisation"},
+                    { name: "3D307E: Character Based Animation"},
+                    { name: "3D308E: Business Components of the Digital Arts Industry"},
+                    
+                    ]
+            },
+            {   name: "MOTION DESIGN", color: [84,224,189],
+                subjects: ["FILM THEORY", "HISTORY OF ART", "VISUAL CULTURE"]
+            },
+            {   name: "SOUND DESIGN", color: [32,143,189],
+                subjects: ["FILM THEORY", "HISTORY OF ART", "VISUAL CULTURE"]
+            },
+            {   name: "SCREEN WRITING", color: [123,105,145],
+                subjects: ["FILM THEORY", "HISTORY OF ART", "VISUAL CULTURE"]
+            },
+            {   name: "SCREEN ACTING", color: [191,95,133],
+                subjects: ["FILM THEORY", "HISTORY OF ART", "VISUAL CULTURE"]
+            },
+        ],
+        people: [
+            {name: "Carlos Vilela"},
+            {name: "Christopher Pinto"},
+            {name: "Stephan Calitz"},
+            {name: "Sean Viljoen"},
+            {name: "Riyahd Cassiem"},
+            {name: "Rouan vd Ende"},
+            {name: "Jacques Leemans"},
+        ]
+    }
+
+    var filmArts, interactive, designstudies, visualstudies;
+
+    init();
+    animate();
+
+    function init() {
+        scene = new THREE.Scene();
+        campivot = new THREE.Object3D();
+        camera = new THREE.PerspectiveCamera( 350, window.innerWidth / window.innerHeight, 1, 10000 );
+        
+        camera.position.z = 750;
+        scene.add(camera)
+
+
+        
+        //scene.fog = new THREE.FogExp2( 0xffffff, 0.01 );
+        scene.add(campivot)        
+        for (major in vw.departments) {
+            var ratio = major / vw.departments.length;
+            var rsize = 1 / vw.departments.length;
+            vw.departments[major].mesh = makeElement(70,45,ratio,ratio+rsize,vw.departments[major].color, 0, vw.departments[major].name)
+        }
+		makeElement(25,25,0,Math.PI*2,[255,255,255], 100)
+
+
+        for (major in vw.departments) {
+                    boxes.push(vw.departments[major].mesh)
+                }
+
+        /*filmArts = 
+
+        interactive = makeElement(90,6,0.25+anim,0.25+anim+0.25,{r:127,g:161,b:124}, 0, "FILM ARTS")
+        */
+
+        projector = new THREE.Projector();
+        renderer = new THREE.WebGLRenderer({antialias:true});
+        onWindowResize()
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.addEventListener( 'mousemove', mouseMove, false );
+        window.addEventListener( 'resize', onWindowResize, false );
+
+        document.body.appendChild( renderer.domElement );
+        doUpdate = true;
+
+    }
+
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        camera.updateProjectionMatrix();        
+    }
+
+
+    function makeElement(radius, thickness, start, end, col, z, title) {
+        geometry = new THREE.TorusGeometry( radius, thickness, 8,240, Math.PI * 2 * (end-start) );
+        material = new THREE.MeshBasicMaterial( { color: rgb(col[0],col[1],col[2]), wireframe: false } );
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.z = z
+        mesh.rotation.z = Math.PI + start * Math.PI * 2;
+        mesh.scale.z = 0.1;
+        mesh.life = 0;
+        scene.add( mesh );              
+        if (title != undefined) {
+            theText = title    
+            text3d = new THREE.TextGeometry( theText, {
+            size: 8,
+            height: 0.1,
+            curveSegments: 4,
+            font: "helvetiker"
+        });
+        text3d.computeBoundingBox();
+        
+        var centerOffsetx = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
+        
+        var centerOffsety = -0.5 * ( text3d.boundingBox.max.y - text3d.boundingBox.min.y );
+        
+        
+        
+
+
+        textMaterial = new THREE.MeshBasicMaterial( { color: rgb(128,128,128), wireframe: false } );
+        text = new THREE.Mesh( text3d, textMaterial );
+        
+        //text.rotation.z = -(start * Math.PI * 2) + Math.PI 
+        text.position.x = (Math.sin((Math.PI/2)+mesh.rotation.z+(Math.PI/8))*165)-centerOffsetx;
+        text.position.y = -(Math.cos((Math.PI/2)+mesh.rotation.z+(Math.PI/8))*165)//+centerOffsety;
+        text.position.z = 100;
+        text.rotation.z += Math.PI
+        scene.add(text)
+        mesh.text = text;
+        
+        
+        return mesh;
+        } 
+    }
+
+
+    function onDocumentMouseDown( event ) {
+        event.preventDefault();
+        console.log(event)
+
+                    
+    }
+
+    function mouseMove( event ) {
+        
+        event.preventDefault();
+        doUpdate = true;
+        camera.position.x = (event.x - (window.innerWidth/2))*-0.01
+        camera.position.y = (event.y - (window.innerHeight/2))*0.01
+        user.mouseX = event.clientX;
+        user.mouseY = event.clientY;
+
+        //camera.rotation.y = (event.x - (window.innerWidth/2))/3000
+        //camera.rotation.x = (event.y - (window.innerHeight/2))/3000
+
+        
+
+    }
+
+
+    function myrand() {
+    	return 100+(Math.random()*55)
+    }
+
+    function rgb(r,g,b) {
+    	r = Math.round(r)
+    	g = Math.round(g)
+    	b = Math.round(b)
+    	return "rgb("+r+","+g+","+b+")"
+    }
+
+    //////////////////////////////////////////////////////////////
+
+    function animate() {
+
+        var duration = (Date.now() - user.starttime)/1000 ;
+
+
+        requestAnimationFrame( animate );
+        
+        
+       //filmArts.scale.set(1+Math.sin(Date.now()/1000)*0.5,01+Math.sin(Date.now()/1000)*0.5,01+Math.sin(Date.now()/1000)*0.5)
+        for (major in vw.departments) {
+            //vw.departments[major].mesh.position.z = Math.sin((Date.now()/400)+(major*400))*100/counter;
+            var t = vw.departments[major].mesh.life;
+            //if (t > 70) { t = 100 }
+
+
+            var intro = -5 + (duration*5);
+            if (intro > 0) { intro = 0;}
+
+            var scl = (1.8 * t) + (intro * -10 * (major/2));
+            scl /= 600
+            scl += 1;
+            vw.departments[major].mesh.scale.set(scl,scl,scl)
+            vw.departments[major].mesh.text.position.z = (scl-1)*2500;
+            
+            //scl = 1 -scl * 10;
+            scl -= 1;
+            scl = 1 - scl
+            scl -= 0.55
+            //scl *= 55;
+            
+            console.log(scl)
+            vw.departments[major].mesh.text.material.color.setRGB(scl,scl,scl);
+            
+            
+            vw.departments[major].mesh.life = vw.departments[major].mesh.life * 0.95;
+        }
+        counter += 0.02 + (counter/1000);
+        //console.log(obId)
+        //camera.rotation.z = Math.PI;
+        camera.position.z = 100 + (duration*1000);
+        if (camera.position.z > 750) { camera.position.z = 750}
+            camera.position.z *= 5;
+        //console.log(Math.sin(duration))
+        //camera.position.z = 500+Math.sin(Date.now()/1000)*10;
+                renderer.render( scene, camera );
+
+var vector = new THREE.Vector3( ( user.mouseX / window.innerWidth ) * 2 - 1, - ( user.mouseY / window.innerHeight ) * 2 + 1, 0.5 );
+                projector.unprojectVector( vector, camera );
+
+                var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );                
+
+                var intersects = raycaster.intersectObjects( boxes );
+
+                if ( intersects.length > 0 ) {
+                    //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+                    //intersects[ 0 ].object.scale.x = 0.1;
+                    intersects[ 0 ].object.life = 100;
+                    //console.log(intersects[ 0 ].point)
+                }   
+
+    }
+
+</script>
+	</body>
+</html>

@@ -1,0 +1,93 @@
+<html>
+	<head>
+		<title>Lesson 3</title>
+		<style>
+			* { margin: 0; padding: 0;}
+			body { background: #111;}
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body oncontextmenu="return false;">
+		<script src="./three.min.js"></script>
+<script>
+    var scene = new THREE.Scene()
+
+    var camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 )
+    camera.position.z = 50
+    scene.add(camera)
+
+    var rendersettings = {}
+    rendersettings.antialias = true
+    var renderer = new THREE.WebGLRenderer(rendersettings)
+    renderer.setSize( window.innerWidth, window.innerHeight )
+    document.body.appendChild( renderer.domElement );           //adds the render output to the document
+
+
+    //PARTICLES
+    var geometry = new THREE.Geometry();
+    for ( i = 0; i < 20000; i ++ ) {
+                var vertex = new THREE.Vector3();
+                vertex.x = Math.random() * 200 - 100;
+                vertex.y = Math.random() * 200 - 100;
+                vertex.z = Math.random() * 200 - 100;
+                geometry.vertices.push( vertex );
+            }
+    var matsettings = {}
+    matsettings.size = 0.2;
+    var material = new THREE.ParticleBasicMaterial( matsettings );
+    material.color.setHSL( 1,0.1,1 );
+    stars = new THREE.ParticleSystem( geometry, material );
+    scene.add( stars );
+
+    document.addEventListener( 'mousedown', mouseDown, false );
+    document.addEventListener( 'mousemove', mouseMove, false );
+    document.addEventListener( 'keydown', keyDown, false );
+    document.addEventListener( 'keyup', keyUp, false );
+
+    animate()
+
+    function animate() {
+    	//camera.rotation.z += 0.001
+        
+        requestAnimationFrame( animate )         
+        renderer.render( scene, camera )
+    }
+
+    function rgb(red,green,blue) {
+        var r = Math.round( red   * Math.random() )
+        var g = Math.round( green * Math.random() )
+        var b = Math.round( blue  * Math.random() )
+        return "rgb("+r+","+g+","+b+")"
+    }
+
+    function mouseDown( mousebutton ) {
+        mousebutton.preventDefault(); //prevents browser popup/link following etc.
+        console.log(mousebutton)  //check the browser console to see the event properties
+        if (mousebutton.button == 0) {
+            //LEFT CLICK
+            camera.position.z = 400    
+        }
+        if (mousebutton.button == 2) {
+            //RIGHT CLICK
+            camera.position.z = 100
+        }
+        
+    }
+
+    function mouseMove( mouse ) {
+        mouse.preventDefault();
+        stars.rotation.x = mouse.x/1000
+        stars.rotation.y = mouse.y/1000
+    }
+
+    function keyDown( key ) {
+        console.log("key down:"+key.which)
+    }
+
+    function keyUp( key ) {        
+        console.log("key up:"+key.which)
+    }
+
+</script>
+	</body>
+</html>

@@ -7,7 +7,10 @@ Getting started
 ===============
 
 To start, download and install nodejs from http://nodejs.org/
+
 Get the latest course files from https://github.com/virtualwindow/threejs-course/archive/master.zip
+
+Make sure you are using chrome http://www.google.com/chrome
 
 Extract the course files and open a command prompt at this folder. 
 On windows hold shift and right click on the threejs-course folder and select "Open command window here"

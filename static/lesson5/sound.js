@@ -23,6 +23,7 @@ var self;
 var timeout;
 
 function Sound() {
+	console.log("!!!")
 	self = this;
 	this.setup();
 }
@@ -31,7 +32,7 @@ Sound.prototype.setup = function() {
 	
 	if (! window.AudioContext) {
 		if (! window.webkitAudioContext) {
-			displayText("<span style='font-size:14px; color:#fff'>bad browser (could not use webkitAudioContext)<br />Try with the latest version of <a href='https://www.google.com/chrome'>Google Chrome</a></span>");
+			console.log("<span style='font-size:14px; color:#fff'>bad browser (could not use webkitAudioContext)<br />Try with the latest version of <a href='https://www.google.com/chrome'>Google Chrome</a></span>");
 			return;
 		}
 		window.AudioContext = window.webkitAudioContext;
@@ -51,7 +52,7 @@ Sound.prototype.initAudio = function(arrayBuffer) {
 			createAudio();
 		}, function(e) {
 			console.log(e);
-			displayText("wrong file (cannot decode audio data)<br />try another -mp3, wav, ogg- file");
+			console.log("wrong file (cannot decode audio data)<br />try another -mp3, wav, ogg- file");
 		});
 	} else {
 		source.buffer = audiocontext.createBuffer(arrayBuffer, MIX_TO_MONO /*mixToMono*/);
@@ -59,7 +60,7 @@ Sound.prototype.initAudio = function(arrayBuffer) {
 	}
 };
 function finish() {
-	displayText("no track to be played");
+	console.log("no track to be played");
 }
 function createAudio() {
 	processor = audiocontext.createJavaScriptNode(NUM_SAMPLES /*bufferSize*/, 1 /*num inputs*/, 1 /*numoutputs*/);
@@ -75,7 +76,7 @@ function createAudio() {
     source.noteOn(0);
 	timeout = window.setTimeout(finish, source.buffer.duration * 1000);
 
-    displayText("");	//done
+    console.log("");	//done
 }
 
 Sound.prototype.disconnect = function() {
@@ -102,7 +103,7 @@ function processAudio(e) {
 
 Sound.prototype.load = function(url) {
 	songname = "";
-	displayText("processing audio...");
+	console.log("processing audio...");
 	var request = new XMLHttpRequest();
 	request.open('GET', url, true);
 	request.responseType = 'arraybuffer';
@@ -113,4 +114,4 @@ Sound.prototype.load = function(url) {
 	request.send();
 };
 
-Sound.prototype.byteData = function() { return freqByteData };
+Sound.prototype.byteData = function() { return freqByteData };
